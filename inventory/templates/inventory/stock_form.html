@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Stock In / Out</h3>
+
+<!-- Messages -->
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+<!-- Stock Form -->
+<form method="POST" action="{% url 'stock_update' %}">
+    {% csrf_token %}
+    
+    <!-- Product Dropdown -->
+    <label for="product">Product:</label>
+    
+<input
+    class="form-control mb-2"
+    name="product"
+    list="products"
+    placeholder="Type product name"
+    required
+>
+
+<datalist id="products">
+    {% for product in products %}
+        <option value="{{ product.name }}"></option>
+    {% endfor %}
+</datalist>
+
+    <!-- Quantity -->
+    <label for="quantity">Quantity:</label>
+    <input class="form-control mb-2" type="number" name="quantity" id="quantity" value="1" min="1">
+
+    <!-- Action Buttons -->
+    <button class="btn btn-success" type="submit" name="action" value="IN">Add Stock</button>
+    <button class="btn btn-danger" type="submit" name="action" value="OUT">Remove Stock</button>
+</form>
+
+<!-- Current Stock Table -->
+<h4 class="mt-4">Current Stock</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products %}
+        <tr>
+            <td>{{ product.name }}</td>
+            <td>{{ product.quantity }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+{% endblock %}

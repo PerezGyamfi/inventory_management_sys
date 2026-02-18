@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>Add Product</h3>
+
+<form method="POST" action="{% url 'add_product' %}">
+    {% csrf_token %}
+
+    <input class="form-control mb-2" name="name" placeholder="Product Name" required>
+
+    <select class="form-control mb-2" name="category" required>
+        {% for category in categories %}
+        <option value="{{ category.id }}">{{ category.name }}</option>
+        {% endfor %}
+    </select>
+
+    <input class="form-control mb-2" type="number" name="quantity" placeholder="Quantity" required>
+    <input class="form-control mb-2" type="number" step="0.01" name="price" placeholder="Price" required>
+
+    <button class="btn btn-success">Save</button>
+</form>
+{% endblock %}

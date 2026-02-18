@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Products{% endblock %}
+
+{% block content %}
+<h3>Products</h3>
+<form method="GET" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <input
+            type="text"
+            name="search"
+            class="form-control"
+            placeholder="Search product name"
+            value="{{ request.GET.search }}"
+        >
+    </div>
+
+    <div class="col-md-4">
+        <select name="category" class="form-control">
+            <option value="">All Categories</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}"
+                    {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}
+                >
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-2">
+    <select name="sort" class="form-control">
+        <option value="">Sort By</option>
+        <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>Name</option>
+        <option value="quantity" {% if request.GET.sort == 'quantity' %}selected{% endif %}>Quantity</option>
+        <option value="price" {% if request.GET.sort == 'price' %}selected{% endif %}>Price</option>
+    </select>
+</div>
+
+
+    <div class="col-md-2">
+        <button class="btn btn-dark w-100">Filter</button>
+    </div>
+
+    
+</form>
+
+
+
+{% if perms.inventory.add_product %}
+<a href="/add-product/" class="btn btn-primary mb-2">Add Product</a>
+{% endif %}
+<table class="table table-bordered">
+    <thead class="table-dark">
+        <tr class="{% if product.quantity <= 5 %}table-danger{% endif %}">
+            <th>Name</th>
+            <th>Category</th>
+            <th>Quantity</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+
+    {% for product in page_obj %}
+
+
+        <tr>
+            <td>{{ product.name }}</td>
+            <td>{{ product.category.name }}</td>
+            <td>{{ product.quantity }}</td>
+            <td>{{ product.price }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<nav>
+    <ul class="pagination">
+
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ request.GET.search }}&category={{ request.GET.category }}&sort={{ request.GET.sort }}">
+                Previous
+            </a>
+        </li>
+        {% endif %}
+
+        <li class="page-item disabled">
+            <span class="page-link">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+        </li>
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ request.GET.search }}&category={{ request.GET.category }}&sort={{ request.GET.sort }}">
+                Next
+            </a>
+        </li>
+        {% endif %}
+
+    </ul>
+</nav>
+
+{% endblock %}

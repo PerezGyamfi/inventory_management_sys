@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% comment %} {% if request.user.is_staff %}
+<a href="{% url 'export_monthly_stock_summary_excel' %}"
+   class="btn btn-success mb-3">
+    Export Monthly Summary (Excel)
+</a>
+{% endif %} {% endcomment %}
+
+{% block title %}Stock History Report{% endblock %}
+
+{% block content %}
+<h2>Stock History Report</h2>
+{% if request.user.is_staff %}
+    <a href="{% url 'export_stock_history_excel' %}"
+       class="btn btn-success mb-3">
+        Export to Excel
+    </a>
+{% endif %}
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-3">
+        <select name="product" id="product" class="form-select">
+            <option value="">All Products</option>
+            {% for product in products %}
+                <option value="{{ product.id }}">{{ product.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+
+<div class="col-md-3">
+     <select name="action" class="form-select">
+        <option value="{{ product.id }}"
+            {% if request.GET.product == product.id|stringformat:"s" %}selected{% endif %}>
+            {{ product.name }}
+        </option>
+
+        <option value="IN"
+            {% if request.GET.action == 'IN' %}selected{% endif %}>
+            Stock In
+        </option>
+        
+        <option value="OUT"
+            {% if request.GET.action == 'OUT' %}selected{% endif %}>
+            Stock Out
+        </option>
+
+
+
+    </select>
+</div>
+
+<div class="col-md-3">
+    <select name="period" class="form-select">
+        <option value="">All Time</option>
+        <option value="daily"
+            {% if request.GET.period == 'daily' %}selected{% endif %}>
+            Today
+        </option>
+        <option value="monthly"
+            {% if request.GET.period == 'monthly' %}selected{% endif %}>
+            This Month
+        </option>
+    </select>
+
+</div>
+
+
+
+
+
+
+    
+
+    <div class="col-md-3">
+        <button class="btn btn-primary w-100">Filter</button>
+    </div>
+</form>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Date</th>
+            <th>Product</th>
+            <th>Action</th>
+            <th>Quantity</th>
+            <th>User</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for history in histories %}
+        <tr>
+            <td>{{ history.timestamp|date:"Y-m-d H:i" }}</td>
+            <td>{{ history.product.name }}</td>
+            <td>
+                {% if history.action == 'IN' %}
+                    <span class="badge bg-success">IN</span>
+                {% else %}
+                    <span class="badge bg-danger">OUT</span>
+                {% endif %}
+            </td>
+            <td>{{ history.quantity }}</td>
+            <td>{{ history.user.username|default:"System" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" class="text-center">No stock history found</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
